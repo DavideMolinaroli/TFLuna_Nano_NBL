@@ -43,7 +43,7 @@ void home_position() {
 	motor.setMaxSpeed(1000);
 
 	// step until the first magnet is detected
-	motor.setSpeed(666);
+	motor.setSpeed(700);
 	while(!counts){
 		motor.runSpeed();
 	}
@@ -72,7 +72,7 @@ void setup() {
 
 	home_position();
 	delay(1000);
-	motor.setSpeed(1000); // steps/s
+	motor.setSpeed(700); // steps/s
 }
 
 void loop() {
@@ -83,11 +83,12 @@ void loop() {
     // pos2=motor.currentPosition();
 	// tfl.get_data(dist);
 	// Serial.println(String(angle*PI/180)+"p"+String(dist)+"p"+String(n));
-	motor.runSpeed();
+	if(motor.runSpeed()) {
+		angle_deg += actual_step_angle;
+		tfl.get_data(dist);
+	}
 	//angle_rad = (fmod(motor.currentPosition(),266.67))*ANGLE_STEP*PI/180;
-	angle_deg += actual_step_angle;
 	// Serial.print(tfl.get_data(dist, amp, temp));
-	tfl.get_data(dist);
 	Serial.println(String(dist)+" "+String(angle_deg));
 	
 	// Serial.print(' ');

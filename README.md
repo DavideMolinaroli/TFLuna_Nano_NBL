@@ -15,6 +15,9 @@ To make the device suitable for a mobile robot that works in a fast-paced enviro
 ### Code organization
 
 The code has been developed using PlatformIo.
+
 The `lib` directory contains an interface to communicate with the TFLuna using I2C.
+
 The `src` directory contains a simple arduino program that steps the stepper motor, collects data from the TFLuna and forwards it to its serial port.
+
 The file `visualization.pde` contains a simple script written in Processing that visualizes in real time the data coming from the Arduino Nano.

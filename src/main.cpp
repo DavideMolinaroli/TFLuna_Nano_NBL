@@ -90,8 +90,13 @@ void loop() {
 	
 	if(perform_step()) {
 		angle_deg += actual_step_angle;
+		
+		if(angle_deg > 360 && angle_deg - actual_step_angle < 360) {
+			angle_deg = angle_deg - 360;
+		}
+
 		tfl.get_data(dist);
+		Serial.println(String(dist)+" "+String(angle_deg));
 	}
 	
-	Serial.println(String(dist)+" "+String(angle_deg));
 }

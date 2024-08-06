@@ -12,7 +12,7 @@ uint8_t stepPin = 3;
 uint8_t dirPin = 4;
 
 // TFLuna data
-uint16_t freq = 0X1F4;
+uint16_t freq = 0XFA;
 uint16_t dist;
 uint16_t amp;
 uint16_t temp;
@@ -29,7 +29,7 @@ float actual_step_angle = ANGLE_STEP*0.75;
 
 unsigned long cur_millis;
 unsigned long prev_millis = 0;
-unsigned long millis_between_steps = 1.5;
+unsigned long millis_between_steps = 4.5;
 
 bool perform_step(){
 	if(cur_millis - prev_millis >= millis_between_steps){

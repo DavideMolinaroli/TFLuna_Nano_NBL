@@ -5,7 +5,7 @@ String data_string;
 String[] data_arr;
 int dist_cm;
 float angle_deg;
-float actual_step_angle = 1.8*0.75;
+float actual_step_angle = 1.8*0.75/4;
 float angle_rad;
 float x;
 float y;

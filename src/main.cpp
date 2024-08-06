@@ -9,7 +9,7 @@
 
 // Stepper motor pins
 uint8_t stepPin = 3;
-uint8_t dirPin = 4;
+uint8_t msPin = 4;
 
 // TFLuna data
 uint16_t freq = 0XFA;
@@ -25,11 +25,11 @@ uint8_t counts = 0;
 
 // Angle measurements
 float angle_deg = 0;
-float actual_step_angle = ANGLE_STEP*0.75;
+float actual_step_angle = ANGLE_STEP*0.75/4;
 
 unsigned long cur_millis;
 unsigned long prev_millis = 0;
-unsigned long millis_between_steps = 4.5;
+unsigned long millis_between_steps = 1;
 
 bool perform_step(){
 	if(cur_millis - prev_millis >= millis_between_steps){
@@ -58,7 +58,7 @@ void home_position() {
 	}
 
 	// Compensate for early detection due to magnet position
-	uint8_t remaining = 150;
+	uint16_t remaining = 150*4;
 
 	while(remaining != 0) {
 		cur_millis = millis();
@@ -72,13 +72,15 @@ void home_position() {
 
 void setup() {
 	pinMode(stepPin, OUTPUT);
-	pinMode(dirPin, OUTPUT);
+	pinMode(msPin, OUTPUT);
 
 	attachInterrupt(digitalPinToInterrupt(2), magnet_detected, RISING);
 	Serial.begin(230400);
 	Wire.begin();
 	tfl.set_freq(freq);
 	tfl.get_freq(freq);
+
+	digitalWrite(msPin, HIGH);
 
 	cur_millis = millis();
 	home_position();
@@ -98,5 +100,4 @@ void loop() {
 		tfl.get_data(dist);
 		Serial.println(String(dist)+" "+String(angle_deg));
 	}
-	
 }

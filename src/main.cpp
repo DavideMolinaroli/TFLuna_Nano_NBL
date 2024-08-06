@@ -29,7 +29,7 @@ float actual_step_angle = ANGLE_STEP*0.75;
 
 unsigned long cur_millis;
 unsigned long prev_millis = 0;
-unsigned long millis_between_steps = 50;
+unsigned long millis_between_steps = 1.5;
 
 bool perform_step(){
 	if(cur_millis - prev_millis >= millis_between_steps){

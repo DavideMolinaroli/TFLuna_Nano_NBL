@@ -1,55 +1,98 @@
 import math
+import threading
+import time
 from collections import deque
 
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import serial
 
-ser = serial.Serial('COM15', 230400) 
+# Replace 'COM3' with the appropriate COM port and adjust the baud rate as needed
+SERIAL_PORT = 'COM15'
+BAUD_RATE = 230400
 
-data_x = deque([0]*267, maxlen = 267)
-data_y = deque([0]*267, maxlen = 267)
+# Number of samples to receive before updating the plot
+UPDATE_INTERVAL = 267
 
-# Create a figure and axis for plotting
-fig, ax = plt.subplots()
-line = ax.scatter([], [], s=5, color='b')
+# Initialize the serial port
+ser = serial.Serial(SERIAL_PORT, BAUD_RATE)
+
+# Deques to store the data points for both dimensions
+data_x = deque([], maxlen=UPDATE_INTERVAL)
+data_y = deque([], maxlen=UPDATE_INTERVAL)
+
+# Condition to signal when the data is ready for plotting
+data_ready = threading.Event()
+
+# Lock for synchronizing access to data_x and data_y
+data_lock = threading.Lock()
+
+# Event to signal threads to stop
+shutdown_event = threading.Event()
 
 def read_data():
-    if ser.in_waiting > 0:
-        try:
-            rline = ser.readline().decode('utf-8').strip() 
-            print(rline)
-            
-            tokens = rline.split()
-            dist_cm = float(tokens[0]) # in cm
-            angle_rad = (float(tokens[1])%360) * math.pi/180 # in rad
+    while not shutdown_event.is_set():
+        if ser.in_waiting > 0:
+            try:
+                # Read a line of data from the serial port
+                rline = ser.readline().decode('utf-8').strip()
+                print(rline)
+                # Split the line into two float values
+                tokens = rline.split()
+                dist_cm = float(tokens[0]) # in cm
+                angle_rad = (float(tokens[1])%360) * math.pi/180 # in rad
+                x = dist_cm*math.cos(angle_rad)
+                y = dist_cm*math.sin(angle_rad)
+                with data_lock:
+                    # Append the values to the deques
+                    data_x.append(x)
+                    data_y.append(y)
+                # Signal that the data is ready for plotting
+                if len(data_x) >= UPDATE_INTERVAL:
+                    data_ready.set()
+            except Exception as e:
+                print(f"Error: {e}")
+        time.sleep(0.0001)  # Sleep briefly to prevent busy-waiting
 
-            data_x.append(dist_cm*math.cos(angle_rad))
-            data_y.append(dist_cm*math.sin(angle_rad))
-        except: 
-            pass   
-        # 267 Measurements make up one full scan
+def plot_data():
+    fig, ax = plt.subplots()
+    scat = ax.scatter([], [], s=5, color='b')  # Initialize an empty scatter plot with smaller markers
+    
+    def animate(frame):
+        if data_ready.is_set():
+            with data_lock:
+                # Update scatter plot
+                scat.set_offsets(list(zip(data_x, data_y)))
+                # Reset the event for the next batch of data
+                data_ready.clear()
+        return scat,
 
-# Animation function
-def animate(frame):
-    read_data()
-    line.set_offsets(list(zip(data_x, data_y)))
-    return line
+    # Set labels
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_xlim(-800, 800)
+    ax.set_ylim(-800, 800)
 
-# Set labels
-ax.set_xlabel('x')
-ax.set_ylabel('y')
-ax.set_xlim(-800, 800)
-ax.set_ylim(-800, 800)
+    # Create an animation object
+    ani = animation.FuncAnimation(fig, animate, interval=100)
 
-# Add a legend to the plot
-ax.legend()
+    # Show the plot
+    plt.show()
 
-# Create an animation object
-ani = animation.FuncAnimation(fig, animate, interval=10)
+# Start threads
+data_thread = threading.Thread(target=read_data, daemon=True)
+plot_thread = threading.Thread(target=plot_data, daemon=True)
 
-# Show the plot
-plt.show()
+data_thread.start()
+plot_thread.start()
 
-# Close the serial port when done
-ser.close()
+# Wait for the plot thread to finish
+try:
+    plot_thread.join()
+finally:
+    # Signal the data thread to stop
+    shutdown_event.set()
+    # Wait for the data thread to finish
+    data_thread.join()
+    # Close the serial port
+    ser.close()

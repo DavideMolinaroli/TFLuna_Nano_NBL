@@ -1,0 +1,13 @@
+### DIY 2D LIDAR
+
+This repository contains the source code of a simple DIY 2D LIDAR. 
+
+The main components are an Arduino Nano, a TFLuna ToF sensor, and a Nema 17 Stepper motor. 
+
+The Arduino Nano receives data from the TFLuna via I2C with a frequency of 250Hz and forwards it via a serial port. 
+
+To accommodate the frequency of the TFLuna, the stepper motor performs a step every 4.5ms, but acceptable practical results were observed even for 3ms per step.
+
+An HTD belt transmits motion between the motor and the ToF sensor with a speed reduction ratio of 0.75. So, the LIDAR gathers 267 measurements each turn.
+
+To make the device suitable for a mobile robot that works in a fast-paced environment, another ToF sensor should be considered. For example, the TFMini has a frequency up to 1KHz, thus letting the stepper motor make a step every 1ms.

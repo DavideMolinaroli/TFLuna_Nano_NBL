@@ -1,4 +1,5 @@
 ### DIY 2D LIDAR
+![Lidar Image](media/lidar.jpg)
 
 This repository contains the source code of a simple DIY 2D LIDAR. 
 

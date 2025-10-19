@@ -13,7 +13,7 @@ An HTD belt transmits motion between the motor and the ToF sensor with a speed r
 To make the device suitable for a mobile robot that works in a fast-paced environment, another ToF sensor should be considered. For example, the TFMini has a frequency up to 1KHz, thus letting the stepper motor make a step every 1ms.
 
 ### CAD
-The CAD project is available in Onshape: https://cad.onshape.com/documents/249c78569ae08aaf29020e79/w/a476b28fa653176d6b6f8158/e/9c39c3b85f20b129b75a8c5a?renderMode=0&uiState=66b2395569574c4dad6f0dd0
+[The CAD project is available in Onshape](https://cad.onshape.com/documents/249c78569ae08aaf29020e79/w/a476b28fa653176d6b6f8158/e/9c39c3b85f20b129b75a8c5a?renderMode=0&uiState=66b2395569574c4dad6f0dd0&renderMode=0&leftPanel=false&uiState=68f42b6bf4284e82af42bd74)
 
 ### Code organization
 
